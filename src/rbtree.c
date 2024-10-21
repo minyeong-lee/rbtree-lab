@@ -6,19 +6,27 @@
 rbtree *new_rbtree(void) {
   rbtree *t = (rbtree *)calloc(1, sizeof(rbtree));  //동적으로 할당
   // TODO: initialize struct if needed
-  t->nil = NULL;
-  t->root = NULL;
+  t->nil = (node_t *)malloc(sizeof(node_t));
+  t->root = t->nil;
 
-  //nill 포인터 생성
-  node_t * nil = (node_t *)malloc(sizeof(node_t));
+  //nill 포인터 생성할 필요 없음
+  node_t * nil = t->nil;
   nil->color = RBTREE_BLACK;
-  nil->parent = NULL;
+  nil->parent = NULL;  // NULL 말고 nil 로 초기화 해도 좋음
   nil->left = NULL;
   nil->right = NULL;
 
+  /*
+    [주혁 코드리뷰]
+    NULL 말고 nil로 초기화 하는 것이 좋음
+    구현 상으로 할 때 그게 편함  
+
+    굳이 새로운 nil을 만들 필요가 없음!
+  */
+
   //연결
-  t->root = nil;
-  t->nil = nil;
+  // t->root = nil;
+  // t->nil = nil;
 
   return t;
 }
@@ -203,7 +211,19 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
       temp = temp->left;
     }
   }
-  return temp;
+  //찾고자 하는 key 값이 없을 때
+  //temp는 결국 nil 노드를 가리킴
+
+  //검색 실패 시 NULL을 반환하여 명확하게 처리함
+  return NULL;
+
+  /*
+  [해당 함수 반환형이 node_t * 타입인데, NULL 반환이 되는가?]
+  - node_t * 가 반환 타입이기 때문에 포인터를 반환하는 함수임
+    그래서 NULL을 반환하는 것이 가능함
+  - NULL은 특수한 포인터 값으로, 아무것도 가리키지 않는다는 의미
+  - C에서는 포인터 타입을 반환하는 함수가 NULL을 반환하는 것이 일반적인 방법임
+  */
 }
 
 node_t *rbtree_min(const rbtree *t) {
